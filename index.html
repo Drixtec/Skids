@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Data Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            flex-direction: column;
+        }
+        .searchbar {
+            width: 80%;
+            max-width: 600px;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 25px;
+            border: 2px solid #ccc;
+            font-size: 16px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .container {
+            width: 80%;
+            max-width: 600px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .user {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+        .user img {
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            margin-right: 20px;
+        }
+        .userinfo {
+            display: flex;
+            flex-direction: column;
+        }
+        .userinfo span {
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <input type="text" id="searchInput" class="searchbar" placeholder="Search users by username...">
+
+    <div class="container" id="userContainer">
+        <div id="loading">Loading user data...</div>
+    </div>
+
+    <script>
+        let usersData = [];
+
+        fetch('skidsv2.json')
+            .then(response => response.json())
+            .then(data => {
+                usersData = data.users;
+                document.getElementById('loading').style.display = 'none';
+                renderUsers(usersData);
+            })
+            .catch(error => {
+                document.getElementById('loading').innerText = 'Failed to load user data.';
+            });
+
+        function renderUsers(users) {
+            const container = document.getElementById('userContainer');
+            container.innerHTML = '';
+            users.forEach(user => {
+                const userDiv = document.createElement('div');
+                userDiv.classList.add('user');
+                userDiv.innerHTML = `
+                    <img src="${user.profile_picture}" alt="Profile Picture">
+                    <div class="userinfo">
+                        <span>Username:</span> ${user.username}
+                        <span>User ID:</span> ${user.id}
+                    </div>
+                `;
+                container.appendChild(userDiv);
+            });
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (event) => {
+            const searchTerm = event.target.value.toLowerCase();
+            const filteredUsers = usersData.filter(user => user.username.toLowerCase().includes(searchTerm));
+            renderUsers(filteredUsers);
+        });
+    </script>
+
+</body>
+</html>
